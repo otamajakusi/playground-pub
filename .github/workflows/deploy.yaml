@@ -31,19 +31,21 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: >
-      ${{ github.event_name == 'workflow_dispatch' }} && github.event.inputs.kind ||
-      ${{ github.ref == 'refs/heads/main' }} && 'dev' ||
-      ${{ github.ref == 'refs/heads/pre' }} && 'pre' ||
-      ${{ github.ref == 'refs/heads/stg' }} && 'stg' ||
-      'prod'
+    environment: |-
+      ${{
+        github.event_name == 'workflow_dispatch' && github.event.inputs.kind ||
+        github.ref == 'refs/heads/main' && 'dev' ||
+        github.ref == 'refs/heads/pre' && 'pre' ||
+        github.ref == 'refs/heads/stg' && 'stg' ||
+        'prod' }}
     env:
-      KIND: >
-        ${{ github.event_name == 'workflow_dispatch' }} && github.event.inputs.kind ||
-        ${{ github.ref == 'refs/heads/main' }} && 'dev' ||
-        ${{ github.ref == 'refs/heads/pre' }} && 'pre' ||
-        ${{ github.ref == 'refs/heads/stg' }} && 'stg' ||
-        'prod'
+      KIND: |-
+        ${{
+          github.event_name == 'workflow_dispatch' && github.event.inputs.kind ||
+          github.ref == 'refs/heads/main' && 'dev' ||
+          github.ref == 'refs/heads/pre' && 'pre' ||
+          github.ref == 'refs/heads/stg' && 'stg' ||
+          'prod' }}
 
     steps:
       - uses: actions/checkout@v2
