@@ -1,0 +1,55 @@
+name: Deploy
+
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches:
+      - main # dev
+      - pre # pre
+      - stg # stg
+      - prod # prod
+
+  # Allow mannually trigger
+  workflow_dispatch:
+    inputs:
+      force_deploy:
+        type: boolean
+        description: 'Force deploy the ML backend VM'
+        required: false
+        default: false
+      kind:
+        description: 'Choose the kind to deploy'
+        required: true
+        type: choice
+        options:
+          - dev
+          - pre
+          - stg
+          - prod
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: >
+      github.event_name == 'workflow_dispatch' && github.event.inputs.kind ||
+      github.ref == 'refs/heads/main' && 'dev' ||
+      github.ref == 'refs/heads/pre' && 'pre' ||
+      github.ref == 'refs/heads/stg' && 'stg' ||
+      'prod'
+    env:
+      KIND: >
+        github.event_name == 'workflow_dispatch' && github.event.inputs.kind ||
+        github.ref == 'refs/heads/main' && 'dev' ||
+        github.ref == 'refs/heads/pre' && 'pre' ||
+        github.ref == 'refs/heads/stg' && 'stg' ||
+        'prod'
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: echo env
+        run: echo ${{ env.KIND }}
+
+      - name: echo secret
+        run: echo ${{ secrets.SECRET }}
